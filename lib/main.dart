@@ -1,6 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
+import './src/utils/image_capture.dart';
+import './src/Pages/Landing_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -9,60 +11,39 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  final databaseReference = FirebaseFirestore.instance;
+  Future<void> _signInAnonymously() async {
+    try {
+      await FirebaseAuth.instance.signInAnonymously();
+      print('_signInanonumously');
+    } catch (e) {
+      print(e);
+    }
+  }
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        title: 'Flutter Demo',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-          visualDensity: VisualDensity.adaptivePlatformDensity,
-        ),
-        home: Scaffold(
-            appBar: AppBar(
-              title: Text('Inventory App'),
-            ),
-            body: Center(
-              child: Container(
-                child: Column(
-                  children: <Widget>[
-                    RaisedButton(
-                      onPressed: () => {createRecord()},
-                      child: Text('Create Record'),
-                    ),
-                    RaisedButton(
-                      onPressed: () => {getData()},
-                      child: Text('Get Data'),
-                    ),
-                  ],
-                ),
-              ),
-            )));
-  }
-
-  void createRecord() async {
-    await databaseReference.collection("books").doc("1").set({
-      'title': 'Mastering Flutter',
-      'description': 'Programming Guide for Dart'
-    });
-
-    DocumentReference ref = await databaseReference.collection("books").add({
-      'title': 'Flutter in Action',
-      'description': 'Complete Programming Guide to learn Flutter'
-    });
-    print(ref.id);
-  }
-
-  void getData() {
-    databaseReference.collection("books").get().then((QuerySnapshot snapshot) {
-      print(snapshot.toString());
-      snapshot.docs.forEach((f) => {
-            f.data().forEach((key, value) {
-              print(value);
-            })
-          });
-    });
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
+      home: StreamBuilder<User>(
+          stream: FirebaseAuth.instance.authStateChanges(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.active) {
+              User user = snapshot.data;
+              if (user == null) {
+                _signInAnonymously();
+                return LandingPage();
+              } else {
+                return ImageCapture();
+              }
+            } else {
+              return LandingPage();
+            }
+          }),
+    );
   }
 }
