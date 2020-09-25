@@ -1,16 +1,27 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import './src/utils/image_capture.dart';
-import './src/Pages/Landing_page.dart';
+import 'package:provider/provider.dart';
+import 'src/ViewModels/ThemeManager.dart';
+import 'src/Pages/LandingPage.dart';
+import 'src/Widgets/BottomNavBar.dart';
+import 'src/Singleton.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp(MyApp());
+  Singleton.instance;
+  return runApp(
+    ChangeNotifierProvider<ThemeNotifier>(
+      create: (_) => new ThemeNotifier(),
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
+  static bool _fireSignIn = true;
+
   Future<void> _signInAnonymously() async {
     try {
       await FirebaseAuth.instance.signInAnonymously();
@@ -23,27 +34,30 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    var theme = Provider.of<ThemeNotifier>(context);
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
+      theme: theme.getTheme(),
       home: StreamBuilder<User>(
-          stream: FirebaseAuth.instance.authStateChanges(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.active) {
-              User user = snapshot.data;
-              if (user == null) {
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.active) {
+            if (!snapshot.hasData) {
+              print('im inside stream builder');
+              if (_fireSignIn) {
                 _signInAnonymously();
-                return LandingPage();
-              } else {
-                return ImageCapture();
+                _fireSignIn = false;
               }
-            } else {
               return LandingPage();
+            } else {
+              print('inside else');
+              return BottomNavBar();
             }
-          }),
+          } else {
+            print('snapshot else');
+            return LandingPage();
+          }
+        },
+      ),
     );
   }
 }
