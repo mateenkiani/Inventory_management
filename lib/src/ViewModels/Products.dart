@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:inventory_management/src/Models/product.dart';
+import 'package:inventory_management/src/Services/firestore.dart';
 
 class ProductsListViewModel extends ChangeNotifier {
   List<ProductsViewModel> products = List<ProductsViewModel>();
 
-  Future<void> fetchProducts() async {
-    final results = 3;
-  }
+  Future<void> fetchProducts() async {}
 }
 
 class ProductsViewModel {
-  Product _product;
+  final FirestoreService firestoreService = FirestoreService();
 
-  ProductsViewModel() {}
+  void addProductToDatabase(Product product) {
+    firestoreService.addRecord(product);
+  }
 }
