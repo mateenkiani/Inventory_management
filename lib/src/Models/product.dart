@@ -1,20 +1,33 @@
-class Product {
-  String _title;
-  double _price;
-  int _quantity;
-  String _category;
-  String _image;
-  String _description;
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-  Product(this._title, this._price, this._quantity, this._category, this._image,
-      this._description);
+class Product {
+  String title;
+  double price;
+  int quantity;
+  String category;
+  String imageUrl;
+  String description;
+  String id;
+
+  Product(this.title, this.price, this.quantity, this.category, this.imageUrl,
+      this.description);
 
   Map<String, dynamic> toMap() => {
-        'title': this._title,
-        'price': this._price,
-        'quantity': this._quantity,
-        'category': this._category,
-        'image': this._image,
-        'description': this._description
+        'title': this.title,
+        'price': this.price,
+        'quantity': this.quantity,
+        'category': this.category,
+        'imageUrl': this.imageUrl,
+        'description': this.description,
       };
+
+  Product.fromSnapshot(DocumentSnapshot snapshot)
+      : assert(snapshot != null),
+        id = snapshot.id,
+        title = snapshot.data()['title'],
+        price = snapshot.data()['price'].toDouble(),
+        quantity = snapshot.data()['quantity'].toInt(),
+        category = snapshot.data()['category'],
+        imageUrl = snapshot.data()['imageUrl'],
+        description = snapshot.data()['description'];
 }
