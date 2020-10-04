@@ -7,25 +7,26 @@ class FirebaseStorage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text('Inventory App'),
-        ),
-        body: Center(
-          child: Container(
-            child: Column(
-              children: <Widget>[
-                RaisedButton(
-                  onPressed: () => {createRecord()},
-                  child: Text('Create Record'),
-                ),
-                RaisedButton(
-                  onPressed: () => {getData()},
-                  child: Text('Get Data'),
-                ),
-              ],
-            ),
+      appBar: AppBar(
+        title: Text('Inventory App'),
+      ),
+      body: Center(
+        child: Container(
+          child: Column(
+            children: <Widget>[
+              RaisedButton(
+                onPressed: () => {createRecord()},
+                child: Text('Create Record'),
+              ),
+              RaisedButton(
+                onPressed: () => {getData()},
+                child: Text('Get Data'),
+              ),
+            ],
           ),
-        ));
+        ),
+      ),
+    );
   }
 
   void createRecord() async {

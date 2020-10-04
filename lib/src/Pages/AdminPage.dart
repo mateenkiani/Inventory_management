@@ -8,6 +8,35 @@ class AdminPage extends StatefulWidget {
 }
 
 class _AdminPage extends State<AdminPage> {
+  Future<void> _showMyDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Are you sure?'),
+          content: SingleChildScrollView(
+            child: Text('Tapping delete will remove the whole item'),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            FlatButton(
+              child: Text('Delete'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -40,8 +69,11 @@ class _AdminPage extends State<AdminPage> {
                               style: Theme.of(context).textTheme.headline6,
                             ),
                             Spacer(),
-                            Text(
-                              "\$ " + product.price.toString(),
+                            IconButton(
+                              icon: Icon(Icons.delete),
+                              onPressed: () {
+                                _showMyDialog();
+                              },
                             ),
                           ],
                         ),

@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:inventory_management/src/Services/firebaseStorage.dart';
-import 'package:inventory_management/src/Singleton.dart';
 
 class ImageUploader extends StatefulWidget {
   final File file;
@@ -22,10 +21,9 @@ class _ImageUploaderState extends State<ImageUploader> {
     storageService = FirebaseStorageService();
   }
 
-  void _uploadImage() async {
+  Future<String> _uploadImage() async {
     String url = await storageService.uploadImage(widget.file);
-    // Singleton.instance.setDownloadUrl(url);
-    // print(Singleton.instance.downloadUrl);
+    return url;
   }
 
   @override
