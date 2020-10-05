@@ -20,17 +20,6 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  static bool _fireSignIn = true;
-
-  Future<void> _signInAnonymously() async {
-    try {
-      await FirebaseAuth.instance.signInAnonymously();
-      print('_signInanonumously');
-    } catch (e) {
-      print(e);
-    }
-  }
-
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -43,10 +32,6 @@ class MyApp extends StatelessWidget {
           if (snapshot.connectionState == ConnectionState.active) {
             if (!snapshot.hasData) {
               print('im inside stream builder');
-              if (_fireSignIn) {
-                _signInAnonymously();
-                _fireSignIn = false;
-              }
               return LandingPage();
             } else {
               print('inside else');

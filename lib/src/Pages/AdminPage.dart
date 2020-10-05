@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:inventory_management/src/Models/product.dart';
+import 'package:inventory_management/src/Pages/ItemPage.dart';
+import 'package:inventory_management/src/Services/firestore.dart';
 
 class AdminPage extends StatefulWidget {
   @override
@@ -8,6 +10,38 @@ class AdminPage extends StatefulWidget {
 }
 
 class _AdminPage extends State<AdminPage> {
+  final FirestoreService _firestoreService = FirestoreService();
+
+  Future<void> _deleteItem(String docID) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Are you sure?'),
+          content: SingleChildScrollView(
+            child: Text('Tapping delete will remove the whole item'),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            FlatButton(
+              child: Text('Delete'),
+              onPressed: () {
+                _firestoreService.deleteDocument(docID);
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -27,48 +61,39 @@ class _AdminPage extends State<AdminPage> {
                 Product product =
                     Product.fromSnapshot(snapshot.data.documents[index]);
 
-                return Card(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          children: [
-                            Text(
-                              product.title,
-                              style: Theme.of(context).textTheme.headline6,
-                            ),
-                            Spacer(),
-                            Text(
-                              "\$ " + product.price.toString(),
-                            ),
-                          ],
+                return InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ItemPage(
+                          product: product,
+                          isAdmin: true,
                         ),
                       ),
-                      SizedBox(
-                        height: 200,
-                        width: double.infinity,
-                        child: Image.network(
-                          product.imageUrl,
-                          fit: BoxFit.fitWidth,
-                        ),
+                    );
+                  },
+                  child: ListTile(
+                    isThreeLine: true,
+                    subtitle:
+                        Text(product.quantity.toString() + ' items reamining'),
+                    leading: Material(
+                      elevation: 4.0,
+                      shape: CircleBorder(),
+                      clipBehavior: Clip.hardEdge,
+                      color: Colors.transparent,
+                      child: Ink.image(
+                        image: NetworkImage(product.imageUrl),
+                        fit: BoxFit.cover,
+                        width: 50.0,
+                        height: 50.0,
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          children: [
-                            Text(
-                              product.id.toString(),
-                            ),
-                            Spacer(),
-                            Text(
-                              product.quantity.toString() + " remaining",
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+                    ),
+                    title: Text(product.title),
+                    trailing: IconButton(
+                      icon: Icon(Icons.delete),
+                      onPressed: () => _deleteItem(product.id),
+                    ),
                   ),
                 );
               },

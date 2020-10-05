@@ -55,7 +55,15 @@ class _AddProductsPage extends State<AddProductsPage> {
   void _submitForm(BuildContext context) async {
     _formKey.currentState.save();
     if (captureImage.imageFile != null) {
-      _imageUrl = await _uploadImage(captureImage.imageFile);
+      try {
+        _imageUrl = await _uploadImage(captureImage.imageFile);
+      } catch (e) {
+        Scaffold.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.message),
+          ),
+        );
+      }
     } else {
       Scaffold.of(context).showSnackBar(
         SnackBar(
@@ -74,7 +82,21 @@ class _AddProductsPage extends State<AddProductsPage> {
     );
 
     ProductsViewModel productsViewModel = ProductsViewModel();
-    productsViewModel.addProductToDatabase(product);
+    await productsViewModel.addProductToDatabase(product, (err) {
+      if (err.code == 'permission-denied') {
+        Scaffold.of(context).showSnackBar(
+          SnackBar(
+            content: Text('You do net have write permission!'),
+          ),
+        );
+      } else {
+        Scaffold.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Something went wrong'),
+          ),
+        );
+      }
+    });
   }
 
   Widget _buildForm() {

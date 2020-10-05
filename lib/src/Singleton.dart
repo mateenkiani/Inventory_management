@@ -1,10 +1,8 @@
 class Singleton {
   int _activeNavItem;
-  String _downloadUrl;
 
   Singleton._privateConstructor() {
     _activeNavItem = 0;
-    _downloadUrl = '';
   }
 
   static final Singleton _instance = Singleton._privateConstructor();
@@ -15,10 +13,5 @@ class Singleton {
     _activeNavItem = value;
   }
 
-  void setDownloadUrl(String value) {
-    _downloadUrl = value;
-  }
-
   int get activeItem => _activeNavItem;
-  String get downloadUrl => _downloadUrl;
 }

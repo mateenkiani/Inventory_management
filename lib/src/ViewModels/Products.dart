@@ -11,7 +11,7 @@ class ProductsListViewModel extends ChangeNotifier {
 class ProductsViewModel {
   final FirestoreService firestoreService = FirestoreService();
 
-  void addProductToDatabase(Product product) {
-    firestoreService.addRecord(product);
+  Future<void> addProductToDatabase(Product product, Function onError) async {
+    await firestoreService.addRecord(product, onError);
   }
 }

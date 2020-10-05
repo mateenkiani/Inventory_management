@@ -9,6 +9,7 @@ class ThemeModel {
     accentColor: Colors.white,
     accentIconTheme: IconThemeData(color: Colors.black),
     dividerColor: Colors.black12,
+    appBarTheme: AppBarTheme(color: Colors.black, brightness: Brightness.dark),
   );
 
   final lightTheme = ThemeData(
@@ -19,5 +20,6 @@ class ThemeModel {
     accentColor: Colors.black,
     accentIconTheme: IconThemeData(color: Colors.white),
     dividerColor: Colors.white54,
+    appBarTheme: AppBarTheme(brightness: Brightness.dark),
   );
 }
