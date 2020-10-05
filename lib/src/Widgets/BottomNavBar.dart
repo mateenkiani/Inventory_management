@@ -1,6 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:inventory_management/src/ViewModels/ThemeManager.dart';
 import 'package:inventory_management/src/Widgets/Search.dart';
@@ -110,16 +108,6 @@ class _BottomNavBar extends State<BottomNavBar> {
           Singleton.instance.setActiveNavItem(index);
         },
       );
-    }
-
-    Future<List<QueryDocumentSnapshot>> _getDocs() async {
-      var snap = (await FirebaseFirestore.instance
-              .collection("products")
-              .where("title", isGreaterThanOrEqualTo: 'pa')
-              .get())
-          .docs;
-      print(snap[0].data());
-      return snap;
     }
 
     return Scaffold(
