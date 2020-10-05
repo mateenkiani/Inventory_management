@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:inventory_management/src/Models/product.dart';
+import 'package:inventory_management/src/Pages/ItemPage.dart';
 
 class MyHomePage extends StatefulWidget {
   @override
@@ -28,47 +29,62 @@ class _MyHomePageState extends State<MyHomePage> {
                     Product.fromSnapshot(snapshot.data.documents[index]);
 
                 return Card(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          children: [
-                            Text(
-                              product.title,
-                              style: Theme.of(context).textTheme.headline6,
-                            ),
-                            Spacer(),
-                            Text(
-                              "\$ " + product.price.toString(),
-                            ),
-                          ],
+                  clipBehavior: Clip.antiAlias,
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ItemPage(
+                            product: product,
+                            isAdmin: false,
+                          ),
                         ),
-                      ),
-                      SizedBox(
-                        height: 200,
-                        width: double.infinity,
-                        child: Image.network(
-                          product.imageUrl,
-                          fit: BoxFit.fitWidth,
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          children: [
-                            Text(
-                              product.id.toString(),
+                      );
+                    },
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          height: 200,
+                          width: double.infinity,
+                          child: Ink.image(
+                            fit: BoxFit.fitWidth,
+                            image: NetworkImage(
+                              product.imageUrl,
+                              scale: 0.1,
                             ),
-                            Spacer(),
-                            Text(
-                              product.quantity.toString() + " remaining",
-                            ),
-                          ],
+                          ),
                         ),
-                      ),
-                    ],
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                product.title,
+                                style: Theme.of(context).textTheme.headline6,
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 8),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      "Rs. " + product.price.toString(),
+                                    ),
+                                    Spacer(),
+                                    Text(
+                                      product.quantity.toString() +
+                                          " remaining",
+                                    ),
+                                  ],
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 );
               },

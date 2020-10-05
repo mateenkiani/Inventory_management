@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter_auth_buttons/flutter_auth_buttons.dart';
 
 class LandingPage extends StatelessWidget {
   Future<UserCredential> _signInWithGoogle() async {
@@ -25,29 +26,37 @@ class LandingPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Container(
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.shopping_cart,
-                  size: 50,
-                ),
-                Padding(
-                  padding: EdgeInsets.only(top: 10, bottom: 10),
-                ),
-                Text(
-                  'Inventory Management',
-                  style: TextStyle(
-                    fontSize: 25,
+        child: Builder(
+          builder: (context) => Container(
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.shopping_cart,
+                    size: 50,
                   ),
-                ),
-                RaisedButton(
-                  onPressed: _signInWithGoogle,
-                  child: Text('Sign in with google'),
-                ),
-              ],
+                  SizedBox(height: 10),
+                  Text(
+                    'Inventory Management',
+                    style: TextStyle(
+                      fontSize: 25,
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  GoogleSignInButton(
+                    onPressed: () {
+                      Scaffold.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('You will be signed in shortly'),
+                        ),
+                      );
+                      _signInWithGoogle();
+                    },
+                    darkMode: Theme.of(context).brightness == Brightness.dark,
+                  )
+                ],
+              ),
             ),
           ),
         ),

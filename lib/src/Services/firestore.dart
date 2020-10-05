@@ -3,13 +3,11 @@ import 'package:flutter/services.dart';
 import 'package:inventory_management/src/Models/product.dart';
 
 class FirestoreService {
-  final databaseReference = FirebaseFirestore.instance;
+  var _productsRef = FirebaseFirestore.instance.collection('products');
 
   Future<void> addRecord(Product product, Function onError) async {
     try {
-      var products = FirebaseFirestore.instance.collection('products');
-
-      products
+      _productsRef
           .add(product.toMap())
           .then((value) => print("value" + value.toString()))
           .catchError((err) => onError(err));
@@ -26,18 +24,43 @@ class FirestoreService {
     }
   }
 
-  void getData() {
-    databaseReference.collection("books").get().then((QuerySnapshot snapshot) {
-      print(snapshot.toString());
-      snapshot.docs.forEach(
-        (f) => {
-          f.data().forEach(
-            (key, value) {
-              print(value);
-            },
-          ),
-        },
-      );
-    });
+  Future<void> deleteDocument(String docId) {
+    return _productsRef
+        .doc(docId)
+        .delete()
+        .then(
+          (value) => print("User Deleted"),
+        )
+        .catchError(
+          (error) => print("Failed to delete user: $error"),
+        );
+  }
+
+  Future<void> incQuantity(String docID) {
+    return _productsRef
+        .doc(docID)
+        .update({
+          'quantity': FieldValue.increment(1),
+        })
+        .then((value) => print("Count increased"))
+        .catchError((error) => print("Failed to delete user: $error"));
+  }
+
+  Future<void> decQuantity(String docID) {
+    return _productsRef
+        .doc(docID)
+        .update({
+          'quantity': FieldValue.increment(-1),
+        })
+        .then((value) => print("Count decresed"))
+        .catchError((error) => print("Failed to delete user: $error"));
+  }
+
+  Future<Product> getDoc(String docID) {
+    return _productsRef
+        .doc(docID)
+        .get()
+        .then((value) => Product.fromSnapshot(value))
+        .catchError((error) => print("Failed to delete user: $error"));
   }
 }
