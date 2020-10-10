@@ -8,6 +8,7 @@ class Product {
   String imageUrl;
   String description;
   String id;
+  String time;
 
   Product(this.title, this.price, this.quantity, this.category, this.imageUrl,
       this.description);
@@ -19,6 +20,7 @@ class Product {
         'category': this.category,
         'imageUrl': this.imageUrl,
         'description': this.description,
+        'time': DateTime.now().toString(),
       };
 
   Product.fromSnapshot(DocumentSnapshot snapshot)
@@ -29,5 +31,6 @@ class Product {
         quantity = snapshot.data()['quantity'].toInt(),
         category = snapshot.data()['category'],
         imageUrl = snapshot.data()['imageUrl'],
-        description = snapshot.data()['description'];
+        description = snapshot.data()['description'],
+        time = snapshot.data()['time'];
 }

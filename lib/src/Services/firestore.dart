@@ -11,14 +11,6 @@ class FirestoreService {
           .add(product.toMap())
           .then((value) => print("value" + value.toString()))
           .catchError((err) => onError(err));
-
-      // await FirebaseFirestore.instance
-      //     .collection("products")
-      //     .doc()
-      //     .set(product.toMap())
-      //     .catchError((err) {
-      //   print("error is" + err.toString());
-      // });
     } on PlatformException catch (e) {
       print("eee" + e.toString());
     }
@@ -36,6 +28,16 @@ class FirestoreService {
         );
   }
 
+  Future<void> updatePrice(String docID, double price) {
+    return _productsRef
+        .doc(docID)
+        .update({
+          'price': price,
+        })
+        .then((value) => print("Price Changed"))
+        .catchError((error) => print("Failed to delete user: $error"));
+  }
+
   Future<void> incQuantity(String docID) {
     return _productsRef
         .doc(docID)
@@ -46,11 +48,11 @@ class FirestoreService {
         .catchError((error) => print("Failed to delete user: $error"));
   }
 
-  Future<void> decQuantity(String docID) {
+  Future<void> decQuantity(String docID, {decCount = 1}) {
     return _productsRef
         .doc(docID)
         .update({
-          'quantity': FieldValue.increment(-1),
+          'quantity': FieldValue.increment(-decCount),
         })
         .then((value) => print("Count decresed"))
         .catchError((error) => print("Failed to delete user: $error"));

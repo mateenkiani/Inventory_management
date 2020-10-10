@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:inventory_management/src/Singleton.dart';
 import 'package:inventory_management/src/ViewModels/ThemeManager.dart';
 import 'package:provider/provider.dart';
 
@@ -66,7 +67,9 @@ class SettingsPage extends StatelessWidget {
                       leading: Icon(Icons.exit_to_app),
                       title: Text('Signout'),
                       onTap: () {
+                        Singleton.instance.setActiveNavItem(0);
                         FirebaseAuth.instance.signOut();
+                        Navigator.pop(context);
                       },
                     ),
                   ],

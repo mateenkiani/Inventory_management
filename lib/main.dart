@@ -31,14 +31,11 @@ class MyApp extends StatelessWidget {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.active) {
             if (!snapshot.hasData) {
-              print('im inside stream builder');
               return LandingPage();
             } else {
-              print('inside else');
               return BottomNavBar();
             }
           } else {
-            print('snapshot else');
             return LandingPage();
           }
         },
