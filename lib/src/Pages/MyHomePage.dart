@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:inventory_management/src/Models/product.dart';
@@ -48,14 +49,21 @@ class _MyHomePageState extends State<MyHomePage> {
                         SizedBox(
                           height: 200,
                           width: double.infinity,
-                          child: Ink.image(
+                          child: CachedNetworkImage(
                             fit: BoxFit.fitWidth,
-                            image: NetworkImage(
-                              product.imageUrl,
-                              scale: 0.1,
-                            ),
+                            imageUrl: product.imageUrl,
+                            placeholder: (context, url) => (Center(
+                              child: CircularProgressIndicator(),
+                            )),
                           ),
                         ),
+                        // Ink.image(
+                        //   fit: BoxFit.fitWidth,
+                        //   image: CachedNetworkImage(
+                        //     product.imageUrl,
+                        //   ),
+                        // ),
+                        //),
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Column(

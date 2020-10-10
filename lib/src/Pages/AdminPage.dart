@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:inventory_management/src/Models/product.dart';
@@ -82,11 +83,11 @@ class _AdminPage extends State<AdminPage> {
                       shape: CircleBorder(),
                       clipBehavior: Clip.hardEdge,
                       color: Colors.transparent,
-                      child: Ink.image(
-                        image: NetworkImage(product.imageUrl),
+                      child: CachedNetworkImage(
+                        imageUrl: product.imageUrl,
+                        width: 50,
+                        height: 50,
                         fit: BoxFit.cover,
-                        width: 50.0,
-                        height: 50.0,
                       ),
                     ),
                     title: Text(product.title),

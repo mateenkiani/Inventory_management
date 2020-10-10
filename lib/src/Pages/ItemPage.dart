@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:inventory_management/src/Models/product.dart';
 import 'package:inventory_management/src/Services/firestore.dart';
+import 'package:intl/intl.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class ItemPage extends StatefulWidget {
   final Product product;
@@ -14,6 +16,9 @@ class ItemPage extends StatefulWidget {
 
 class _ItemPage extends State<ItemPage> {
   Product product;
+  double price = 0;
+  bool _pendingInc = false;
+  bool _pendingDec = false;
   final FirestoreService _firestoreService = FirestoreService();
 
   @override
@@ -22,16 +27,56 @@ class _ItemPage extends State<ItemPage> {
     product = widget.product;
   }
 
-  void _inc(String docID) async {
+  Future<void> _inc(String docID) async {
     await _firestoreService.incQuantity(docID);
     product = await _firestoreService.getDoc(docID);
     setState(() {});
   }
 
-  void _dec(String docID) async {
+  Future<void> _dec(String docID) async {
     await _firestoreService.decQuantity(docID);
     product = await _firestoreService.getDoc(docID);
     setState(() {});
+  }
+
+  Future<void> _changePrice(String docID) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Enter new Price'),
+          content: SingleChildScrollView(
+            child: TextField(
+              autofocus: true,
+              onChanged: (value) => {
+                price = double.parse(value),
+              },
+              decoration: InputDecoration(
+                  border: InputBorder.none, hintText: 'Enter new price'),
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            FlatButton(
+              child: Text('Change Price'),
+              onPressed: () async {
+                print(price);
+                _firestoreService.updatePrice(docID, price);
+                product = await _firestoreService.getDoc(docID);
+                setState(() {});
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -44,10 +89,17 @@ class _ItemPage extends State<ItemPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Image.network(
-              product.imageUrl,
+            CachedNetworkImage(
+              imageUrl: product.imageUrl,
               width: double.infinity,
               fit: BoxFit.fitWidth,
+              placeholder: (context, url) => Container(
+                width: double.infinity,
+                height: 200,
+                child: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              ),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -70,6 +122,8 @@ class _ItemPage extends State<ItemPage> {
                         if (widget.isAdmin) ...[
                           Spacer(),
                           Container(
+                            width: 50,
+                            height: 50,
                             margin: EdgeInsets.all(3),
                             decoration: new BoxDecoration(
                               color: Theme.of(context).bottomAppBarColor,
@@ -78,15 +132,30 @@ class _ItemPage extends State<ItemPage> {
                             ),
                             child: Material(
                               color: Colors.transparent,
-                              child: IconButton(
-                                icon: Icon(Icons.arrow_upward),
-                                onPressed: () {
-                                  _inc(product.id);
+                              child: InkWell(
+                                child: !_pendingInc
+                                    ? Icon(Icons.arrow_upward)
+                                    : Padding(
+                                        padding: const EdgeInsets.all(15),
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 1,
+                                        ),
+                                      ),
+                                onTap: () async {
+                                  setState(() {
+                                    _pendingInc = true;
+                                  });
+                                  await _inc(product.id);
+                                  setState(() {
+                                    _pendingInc = false;
+                                  });
                                 },
                               ),
                             ),
                           ),
                           Container(
+                            width: 50,
+                            height: 50,
                             margin: EdgeInsets.all(3),
                             decoration: new BoxDecoration(
                               color: Theme.of(context).bottomAppBarColor,
@@ -95,10 +164,23 @@ class _ItemPage extends State<ItemPage> {
                             ),
                             child: Material(
                               color: Colors.transparent,
-                              child: IconButton(
-                                icon: Icon(Icons.arrow_downward),
-                                onPressed: () {
-                                  _dec(product.id);
+                              child: InkWell(
+                                child: !_pendingDec
+                                    ? Icon(Icons.arrow_downward)
+                                    : Padding(
+                                        padding: const EdgeInsets.all(15),
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 1,
+                                        ),
+                                      ),
+                                onTap: () async {
+                                  setState(() {
+                                    _pendingDec = true;
+                                  });
+                                  await _dec(product.id);
+                                  setState(() {
+                                    _pendingDec = false;
+                                  });
                                 },
                               ),
                             ),
@@ -132,16 +214,53 @@ class _ItemPage extends State<ItemPage> {
                         Row(
                           children: [
                             Text(
-                              'Rs. ' + product.price.toString(),
+                              'Rs. ' + product.price.toStringAsFixed(2),
                               style: Theme.of(context).textTheme.subtitle2,
                             ),
                             Spacer(),
-                            Text(
-                              'Total Price = ' +
-                                  (product.price * product.quantity).toString(),
-                              style: Theme.of(context).textTheme.subtitle2,
+                            InkWell(
+                              onTap: () {
+                                _changePrice(product.id);
+                              },
+                              child: Container(
+                                padding: EdgeInsets.all(8),
+                                decoration: new BoxDecoration(
+                                  color: Theme.of(context).bottomAppBarColor,
+                                  borderRadius: new BorderRadius.all(
+                                      Radius.circular(8.0)),
+                                ),
+                                child: Text('Change Price'),
+                              ),
                             ),
                           ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(top: 5),
+                    padding: EdgeInsets.only(left: 8, right: 8),
+                    width: double.infinity,
+                    height: 70,
+                    decoration: new BoxDecoration(
+                      color: Theme.of(context).backgroundColor,
+                      borderRadius: new BorderRadius.all(Radius.circular(8.0)),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          ('Product added on ' +
+                              new DateFormat.yMMMd().format(
+                                DateTime.parse(product.time),
+                              )),
+                        ),
+                        Spacer(),
+                        Text(
+                          'Total Price = ' +
+                              (product.price * product.quantity)
+                                  .toStringAsFixed(2),
+                          style: Theme.of(context).textTheme.subtitle2,
                         ),
                       ],
                     ),

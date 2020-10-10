@@ -10,6 +10,11 @@ class ThemeModel {
     accentIconTheme: IconThemeData(color: Colors.black),
     dividerColor: Colors.black12,
     appBarTheme: AppBarTheme(color: Colors.black, brightness: Brightness.dark),
+    bottomNavigationBarTheme: BottomNavigationBarThemeData(
+      backgroundColor: Colors.black,
+      selectedItemColor: Colors.white,
+      unselectedItemColor: Colors.grey,
+    ),
   );
 
   final lightTheme = ThemeData(
@@ -21,5 +26,10 @@ class ThemeModel {
     accentIconTheme: IconThemeData(color: Colors.white),
     dividerColor: Colors.white54,
     appBarTheme: AppBarTheme(brightness: Brightness.dark),
+    bottomNavigationBarTheme: BottomNavigationBarThemeData(
+      backgroundColor: Colors.white,
+      selectedItemColor: Colors.black,
+      unselectedItemColor: Colors.black54,
+    ),
   );
 }

@@ -1,18 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
+import 'package:inventory_management/src/Models/SellProduct.dart';
 import 'package:inventory_management/src/Models/product.dart';
 
-class FirestoreService {
-  var _productsRef = FirebaseFirestore.instance.collection('products');
+class SellProductViewModel {
+  final _productsRef = FirebaseFirestore.instance.collection('sellers');
 
-  Future<void> addRecord(Product product, Function onError) async {
+  Future<void> addRecord(SellProduct product) async {
     try {
       _productsRef
           .add(product.toMap())
           .then((value) => print("value" + value.toString()))
-          .catchError((err) => onError(err));
+          .catchError((err) => print(err));
     } on PlatformException catch (e) {
-      print("eee" + e.toString());
+      print("error selling product" + e.toString());
     }
   }
 
@@ -48,11 +49,11 @@ class FirestoreService {
         .catchError((error) => print("Failed to delete user: $error"));
   }
 
-  Future<void> decQuantity(String docID, {decCount = 1}) {
+  Future<void> decQuantity(String docID) {
     return _productsRef
         .doc(docID)
         .update({
-          'quantity': FieldValue.increment(-decCount),
+          'quantity': FieldValue.increment(-1),
         })
         .then((value) => print("Count decresed"))
         .catchError((error) => print("Failed to delete user: $error"));

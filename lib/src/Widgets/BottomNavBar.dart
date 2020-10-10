@@ -1,5 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:inventory_management/src/Pages/SellProductPage.dart';
+import 'package:inventory_management/src/Pages/SoldHistory.dart';
 import 'package:inventory_management/src/ViewModels/ThemeManager.dart';
 import 'package:inventory_management/src/Widgets/Search.dart';
 import 'package:provider/provider.dart';
@@ -22,7 +24,7 @@ class _BottomNavBar extends State<BottomNavBar> {
     MyHomePage(),
     AdminPage(),
     AddProductsPage(),
-    SettingsPage(),
+    SellProductPage(),
   ];
 
   @override
@@ -32,6 +34,7 @@ class _BottomNavBar extends State<BottomNavBar> {
   }
 
   void _signOut() {
+    Singleton.instance.setActiveNavItem(0);
     FirebaseAuth.instance.signOut();
   }
 
@@ -67,7 +70,43 @@ class _BottomNavBar extends State<BottomNavBar> {
               onTap: _signOut,
               child: ListTile(
                 title: Text("Sign out"),
-                trailing: Icon(Icons.exit_to_app),
+                leading: Icon(Icons.exit_to_app),
+              ),
+            ),
+            InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => Scaffold(
+                        appBar: AppBar(
+                          title: Text('Seller History'),
+                        ),
+                        body: SoldHistory()),
+                  ),
+                );
+              },
+              child: ListTile(
+                title: Text("Seller Logs"),
+                leading: Icon(Icons.shopping_basket),
+              ),
+            ),
+            InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => Scaffold(
+                        appBar: AppBar(
+                          title: Text('Settings'),
+                        ),
+                        body: SettingsPage()),
+                  ),
+                );
+              },
+              child: ListTile(
+                title: Text("Settings"),
+                leading: Icon(Icons.settings),
               ),
             ),
           ],
@@ -79,25 +118,25 @@ class _BottomNavBar extends State<BottomNavBar> {
       return BottomNavigationBar(
         items: [
           new BottomNavigationBarItem(
-            icon: new Icon(Icons.home),
-            backgroundColor: Colors.green,
-            title: new Text('Home'),
-          ),
+              icon: new Icon(Icons.home),
+              title: new Text('Home'),
+              backgroundColor:
+                  Theme.of(context).bottomNavigationBarTheme.backgroundColor),
           new BottomNavigationBarItem(
-            icon: new Icon(Icons.account_box),
-            backgroundColor: Colors.cyan,
-            title: new Text('Admin'),
-          ),
+              icon: new Icon(Icons.account_box),
+              title: new Text('Admin'),
+              backgroundColor:
+                  Theme.of(context).bottomNavigationBarTheme.backgroundColor),
           new BottomNavigationBarItem(
-            icon: new Icon(Icons.add_circle),
-            backgroundColor: Colors.orange,
-            title: new Text('Add Product'),
-          ),
+              icon: new Icon(Icons.add_circle),
+              title: new Text('Add Product'),
+              backgroundColor:
+                  Theme.of(context).bottomNavigationBarTheme.backgroundColor),
           new BottomNavigationBarItem(
-            icon: new Icon(Icons.settings),
-            backgroundColor: Colors.redAccent,
-            title: new Text('Settings'),
-          ),
+              icon: new Icon(Icons.shopping_cart),
+              title: new Text('Shop'),
+              backgroundColor:
+                  Theme.of(context).bottomNavigationBarTheme.backgroundColor),
         ],
         currentIndex: i,
         type: BottomNavigationBarType.shifting,
@@ -110,31 +149,44 @@ class _BottomNavBar extends State<BottomNavBar> {
       );
     }
 
-    return Scaffold(
-      key: _scaffoldKey,
-      drawer: _buildDrawer(context),
-      appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.menu),
-          onPressed: () => {
-            _scaffoldKey.currentState.openDrawer(),
-          },
-        ),
-        title: Text('Techshop'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.search),
+    return WillPopScope(
+      onWillPop: () async {
+        if (Singleton.instance.activeItem != 0) {
+          Singleton.instance.setActiveNavItem(0);
+          setState(() {
+            i = Singleton.instance.activeItem;
+          });
+          return false;
+        } else {
+          return true;
+        }
+      },
+      child: Scaffold(
+        key: _scaffoldKey,
+        drawer: _buildDrawer(context),
+        appBar: AppBar(
+          leading: IconButton(
+            icon: Icon(Icons.menu),
             onPressed: () => {
-              showSearch(
-                context: context,
-                delegate: CustomSearchDelegate(),
-              ),
+              _scaffoldKey.currentState.openDrawer(),
             },
-          )
-        ],
+          ),
+          title: Text('Techshop'),
+          actions: [
+            IconButton(
+              icon: Icon(Icons.search),
+              onPressed: () => {
+                showSearch(
+                  context: context,
+                  delegate: CustomSearchDelegate(),
+                ),
+              },
+            )
+          ],
+        ),
+        body: pages[i],
+        bottomNavigationBar: _buildBottomNav(context),
       ),
-      body: pages[i],
-      bottomNavigationBar: _buildBottomNav(context),
     );
   }
 }
